@@ -66,6 +66,23 @@ MODEL_PATH = 'model_trained_101class.hdf5'
 model_best = None
 MODEL_LOADED = False
 
+from huggingface_hub import hf_hub_download
+
+MODEL_PATH = 'model_trained_101class.hdf5'
+model_best = None
+MODEL_LOADED = False
+
+if TF_AVAILABLE and not os.path.exists(MODEL_PATH):
+    print("Downloading model from HuggingFace Hub...")
+    try:
+        hf_hub_download(
+            repo_id="Ashwamedha/nutrilens-model",  # ← change this
+            filename="model_trained_101class.hdf5",
+            local_dir="."
+        )
+    except Exception as e:
+        print(f'Model download failed: {e}')
+
 if TF_AVAILABLE and os.path.exists(MODEL_PATH):
     try:
         tf.keras.backend.clear_session()
@@ -75,7 +92,7 @@ if TF_AVAILABLE and os.path.exists(MODEL_PATH):
     except Exception as e:
         print(f'Model load failed: {e}')
 else:
-    print('Model file not found — running in demo mode (random predictions)')
+    print('Model file not found — running in demo mode')
 
 # ── Load nutrition table ──────────────────────────────────────────────────────
 nutrition_table = {}
@@ -206,14 +223,8 @@ def reset():
 
 
 if __name__ == '__main__':
-    import click
-
-    @click.command()
-    @click.option('--debug', is_flag=True)
-    @click.option('--threaded', is_flag=True)
-    @click.argument('HOST', default='127.0.0.1')
-    @click.argument('PORT', default=5000, type=int)
-    def run(debug, threaded, host, port):
-        app.run(host=host, port=port, debug=debug, threaded=threaded)
-
-    run()
+    app.run(
+        host='0.0.0.0',
+        port=int(os.environ.get('PORT', 7860)),
+        threaded=True
+    )

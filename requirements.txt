@@ -7,3 +7,5 @@ h5py>=3.8
 click>=8.1
 requests>=2.31
 pandas>=2.0
+gunicorn>=21.0
+huggingface_hub>=0.20
